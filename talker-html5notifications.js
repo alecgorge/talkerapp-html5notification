@@ -1,8 +1,10 @@
 (function () {
 	if(window.webkitNotifications) {
-		var go = function () {
+		var nots = []
+		,	blurred = false
+		,	go = function () {
 			var not = function(title, msg) {
-				if(document.webkitHidden) {
+				if(isVisible()) {
 					var icon = "http://talkerapp.com/images/logo.png";
 					return window.webkitNotifications.createNotification(icon, title, msg);
 				}
@@ -10,14 +12,28 @@
 			,	handle = function(e) {
 				var x = not(e.user.name, e.content)
 				if(x) {
+					nots.forEach(function (v) {
+						v.cancel();
+					});
+					nots = [];
 					x.onclick = function () {
 						window.focus();
 						this.cancel();
 						Talker.getMessageBox().focus();
 					}
+					nots.push(x);
 					x.show();
 				}
 			}
+			,	isVisible = function() {
+				return document.webkitHidden || blurred;
+			}
+
+			$(window).blur(function () {
+				blurred = true;
+			}).focus(function () {
+				blurred = false;
+			});
 
 			plugin.onJoin = plugin.onLeave = plugin.onMessageReceived = handle;
 		}
