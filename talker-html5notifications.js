@@ -1,6 +1,12 @@
 (function () {
 	if(window.webkitNotifications) {
 		var nots = []
+		,	clearNots = function () {
+			nots.forEach(function (v) {
+				v.cancel();
+			});
+			nots = [];
+		}
 		,	blurred = false
 		,	go = function () {
 			var not = function(title, msg) {
@@ -12,10 +18,7 @@
 			,	handle = function(e) {
 				var x = not(e.user.name, e.content)
 				if(x) {
-					nots.forEach(function (v) {
-						v.cancel();
-					});
-					nots = [];
+					clearNots();
 					x.onclick = function () {
 						window.focus();
 						this.cancel();
@@ -33,6 +36,7 @@
 				blurred = true;
 			}).focus(function () {
 				blurred = false;
+				clearNots();
 			});
 
 			plugin.onJoin = plugin.onLeave = plugin.onMessageReceived = handle;
